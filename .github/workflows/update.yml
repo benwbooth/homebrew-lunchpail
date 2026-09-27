@@ -1,0 +1,34 @@
+name: Update Lunchbox
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-lunchbox
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check release validation
+        run: python3 -m unittest discover -s scripts
+      - name: Read the latest complete release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/update_cask.py
+      - name: Publish cask update
+        run: |
+          if ! git diff --quiet -- Casks/lunchbox.rb; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add Casks/lunchbox.rb
+            git commit -m 'Update Lunchbox to latest stable release'
+            git push
+          fi

@@ -1,0 +1,22 @@
+name: Validate cask
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cask:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check release validation
+        run: python3 -m unittest discover -s scripts
+      - name: Load cask on Apple Silicon
+        run: |
+          brew tap benwbooth/lunchbox "$GITHUB_WORKSPACE"
+          brew info --cask --json=v2 benwbooth/lunchbox/lunchbox
+          brew fetch --cask benwbooth/lunchbox/lunchbox
