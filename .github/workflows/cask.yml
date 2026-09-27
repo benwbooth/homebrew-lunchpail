@@ -17,8 +17,8 @@ jobs:
         run: python3 -m unittest discover -s scripts
       - name: Load cask on Apple Silicon
         run: |
-          brew tap benwbooth/lunchbox "$GITHUB_WORKSPACE"
-          brew info --cask --json=v2 benwbooth/lunchbox/lunchbox
-          brew install --cask benwbooth/lunchbox/lunchbox
-          test -d /Applications/Lunchbox.app
-          brew uninstall --cask lunchbox
+          brew tap benwbooth/lunchpail "$GITHUB_WORKSPACE"
+          brew info --cask --json=v2 benwbooth/lunchpail/lunchpail
+          brew install --cask benwbooth/lunchpail/lunchpail
+          test -d /Applications/Lunchpail.app
+          brew uninstall --cask lunchpail

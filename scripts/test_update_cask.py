@@ -28,6 +28,19 @@ class CaskTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             render(self.release, self.checksums)
 
+    def test_rename_preserves_existing_published_asset_and_checksum(self):
+        for asset in self.release["assets"]:
+            asset["name"] = asset["name"].replace("Lunchpail", "Lunchbox").replace("lunchpail", "lunchbox")
+        checksums = self.checksums.replace(b"Lunchpail", b"Lunchbox")
+        self.asset("SHA256SUMS")["digest"] = "sha256:" + hashlib.sha256(checksums).hexdigest()
+        cask = render(self.release, checksums)
+        self.assertIn('cask "lunchpail"', cask)
+        self.assertIn('/Lunchbox-macos-arm64.dmg', cask)
+        self.assertIn('app "Lunchbox.app", target: "Lunchpail.app"', cask)
+        self.asset("Lunchbox-macos-arm64.dmg")["name"] = DMG
+        with self.assertRaises(ValueError):
+            render(self.release, checksums)
+
     def test_rejects_bad_manifest(self):
         with self.assertRaises(ValueError):
             render(self.release, b"wrong checksum file")
